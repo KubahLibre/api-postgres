@@ -57,6 +57,20 @@ def liste_themen(status: str | None = None):
             )
         return cur.fetchall()
 
+@app.get("/themen/{thema_id}")
+def thema_holen(thema_id: int) -> dict:
+    """Ein einzelnes Thema. 404, wenn es die Nummer nicht gibt."""
+    with db() as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT * FROM themen WHERE id = %s",
+            (thema_id,),
+        )
+        zeile = cur.fetchone()
+
+    if zeile is None:
+        raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
+
+    return zeile
 
 class ThemaIn(BaseModel):
     """Was der Aufrufer schicken muss - und was er nicht schicken darf.
