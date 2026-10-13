@@ -57,6 +57,7 @@ def liste_themen(status: str | None = None):
             )
         return cur.fetchall()
 
+
 @app.get("/themen/{thema_id}")
 def thema_holen(thema_id: int) -> dict:
     """Ein einzelnes Thema. 404, wenn es die Nummer nicht gibt."""
@@ -72,6 +73,7 @@ def thema_holen(thema_id: int) -> dict:
 
     return zeile
 
+
 class ThemaIn(BaseModel):
     """Was der Aufrufer schicken muss - und was er nicht schicken darf.
 
@@ -82,6 +84,12 @@ class ThemaIn(BaseModel):
     titel: str = Field(min_length=1, max_length=200)
     kategorie_id: int
     notiz: str | None = None
+
+
+class ThemaAenderung(BaseModel):
+    """Beim Aendern nur der Status - titel und notiz bleiben wie sie sind."""
+
+    status: str
 
 
 @app.post("/themen", status_code=201)
@@ -110,3 +118,29 @@ def thema_anlegen(neu: ThemaIn) -> dict:
                 status_code=400,
                 detail=f"Kategorie {neu.kategorie_id} gibt es nicht.",
             ) from None
+
+
+@app.put("/themen/{thema_id}")
+def thema_aendern(thema_id: int, neu: ThemaAenderung) -> dict:
+    """Setzt den Status. 404, wenn es die Nummer nicht gibt.
+
+    RETURNING * loest die 404 ohne zweites SELECT: passiert keine Zeile,
+    liefert die Datenbank nichts zurueck und fetchone() liefert None.
+    """
+    with db() as conn, conn.cursor() as cur:
+        try:
+            cur.execute(
+                "UPDATE themen SET status = %s WHERE id = %s RETURNING *",
+                (neu.status, thema_id),
+            )
+            zeile = cur.fetchone()
+        except psycopg.errors.ForeignKeyViolation:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Status '{neu.status}' gibt es nicht.",
+            ) from None
+
+    if zeile is None:
+        raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
+
+    return zeile
