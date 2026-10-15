@@ -2,6 +2,7 @@ import os
 import psycopg
 from fastapi import FastAPI, HTTPException
 from psycopg.rows import dict_row
+from pydantic import BaseModel, Field
 
 
 app = FastAPI()
@@ -41,3 +42,27 @@ def get_thema(thema_id: int) -> dict:
     if thema is None:
         raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
     return thema
+
+
+class ThemaIn(BaseModel):
+    titel: str = Field(min_length=1, max_length=200)
+    kategorie_id: int
+    notiz: str | None = None
+
+
+@app.post("/themen", status_code=201)
+def thema_anlegen(neu: ThemaIn) -> dict:
+    conn = verbinde()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "INSERT INTO themen (titel, status, kategorie_id, notiz) VALUES (%s, 'offen', %s, %s) RETURNING *",
+            (neu.titel, neu.kategorie_id, neu.notiz),
+        )
+        return cur.fetchone()
+    except psycopg.errors.ForeignKeyViolation:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Kategorie {neu.kategorie_id} gibt es nicht.",
+        ) from None
+
