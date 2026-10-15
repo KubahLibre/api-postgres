@@ -1,5 +1,4 @@
 import os
-from turtle import update
 import psycopg
 from fastapi import FastAPI, HTTPException
 from psycopg.rows import dict_row
@@ -77,9 +76,21 @@ def thema_bearbeiten(thema_id: int, neu: StatusAenderung) -> dict:
         try:
             cur.execute("UPDATE themen SET status = %s WHERE id = %s RETURNING *", (neu.status, thema_id))
             thema = cur.fetchone()
-            return thema
         except psycopg.errors.ForeignKeyViolation:
             raise HTTPException(
                 status_code=400,
                 detail=f"Status '{neu.status}' gibt es nicht.",
-                ) from None
+            ) from None
+    if thema is None:
+        raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
+    return thema
+
+
+@app.delete("/themen/{thema_id}", status_code=200)
+def thema_loeschen(thema_id: int):
+    with db() as conn, conn.cursor() as cur:
+        cur.execute("DELETE FROM themen WHERE id = %s RETURNING *", (thema_id,))
+        geloescht = cur.fetchone()
+    if geloescht is None:
+        raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
+    return geloescht
