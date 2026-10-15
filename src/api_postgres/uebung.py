@@ -18,11 +18,6 @@ def db():
         yield conn
 
 
-
-def verbinde():
-    return psycopg.connect(DATABASE_URL, row_factory=dict_row)
-
-
 @app.get("/kategorien")
 def get_kategorien():
     with db() as conn, conn.cursor() as cur:
@@ -67,5 +62,5 @@ def thema_anlegen(neu: ThemaIn) -> dict:
         except psycopg.errors.ForeignKeyViolation:
             raise HTTPException(
                 status_code=400,
-            detail=f"Kategorie {neu.kategorie_id} gibt es nicht.",
-            ) from None
+                detail=f"Kategorie {neu.kategorie_id} gibt es nicht.",
+                ) from None
