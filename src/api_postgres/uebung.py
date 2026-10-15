@@ -1,4 +1,5 @@
 import os
+from turtle import update
 import psycopg
 from fastapi import FastAPI, HTTPException
 from psycopg.rows import dict_row
@@ -63,4 +64,22 @@ def thema_anlegen(neu: ThemaIn) -> dict:
             raise HTTPException(
                 status_code=400,
                 detail=f"Kategorie {neu.kategorie_id} gibt es nicht.",
+                ) from None
+
+
+class StatusAenderung(BaseModel):
+    status: str
+
+
+@app.put("/themen/{thema_id}")
+def thema_bearbeiten(thema_id: int, neu: StatusAenderung) -> dict:
+    with db() as conn, conn.cursor() as cur:
+        try:
+            cur.execute("UPDATE themen SET status = %s WHERE id = %s RETURNING *", (neu.status, thema_id))
+            thema = cur.fetchone()
+            return thema
+        except psycopg.errors.ForeignKeyViolation:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Status '{neu.status}' gibt es nicht.",
                 ) from None
