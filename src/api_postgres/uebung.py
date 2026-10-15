@@ -3,6 +3,7 @@ import psycopg
 from fastapi import FastAPI, HTTPException
 from psycopg.rows import dict_row
 from pydantic import BaseModel, Field
+from contextlib import contextmanager
 
 
 app = FastAPI()
@@ -11,34 +12,38 @@ app = FastAPI()
 DATABASE_URL = os.environ["DATABASE_URL"]
 
 
+@contextmanager
+def db():
+    with psycopg.connect(DATABASE_URL, row_factory=dict_row) as conn:
+        yield conn
+
+
+
 def verbinde():
     return psycopg.connect(DATABASE_URL, row_factory=dict_row)
 
 
 @app.get("/kategorien")
 def get_kategorien():
-    conn = verbinde()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM kategorien")
-    kategorien = cur.fetchall()
+    with db() as conn, conn.cursor() as cur:
+        cur.execute("SELECT * FROM kategorien")
+        kategorien = cur.fetchall()
     return kategorien
 
 
 @app.get("/themen")
 def get_themen():
-    conn = verbinde()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM themen")
-    themen = cur.fetchall()
+    with db() as conn, conn.cursor() as cur:
+        cur.execute("SELECT * FROM themen")
+        themen = cur.fetchall()
     return themen
 
 
 @app.get("/themen/{thema_id}")
 def get_thema(thema_id: int) -> dict:
-    conn = verbinde()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM themen WHERE id = %s", (thema_id,))
-    thema = cur.fetchone()
+    with db() as conn, conn.cursor() as cur:
+        cur.execute("SELECT * FROM themen WHERE id = %s", (thema_id,))
+        thema = cur.fetchone()
     if thema is None:
         raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
     return thema
@@ -52,17 +57,15 @@ class ThemaIn(BaseModel):
 
 @app.post("/themen", status_code=201)
 def thema_anlegen(neu: ThemaIn) -> dict:
-    conn = verbinde()
-    cur = conn.cursor()
-    try:
-        cur.execute(
-            "INSERT INTO themen (titel, status, kategorie_id, notiz) VALUES (%s, 'offen', %s, %s) RETURNING *",
-            (neu.titel, neu.kategorie_id, neu.notiz),
-        )
-        return cur.fetchone()
-    except psycopg.errors.ForeignKeyViolation:
-        raise HTTPException(
-            status_code=400,
+    with db() as conn, conn.cursor() as cur:
+        try:
+            cur.execute(
+                "INSERT INTO themen (titel, status, kategorie_id, notiz) VALUES (%s, 'offen', %s, %s) RETURNING *",
+                (neu.titel, neu.kategorie_id, neu.notiz),
+            )
+            return cur.fetchone()
+        except psycopg.errors.ForeignKeyViolation:
+            raise HTTPException(
+                status_code=400,
             detail=f"Kategorie {neu.kategorie_id} gibt es nicht.",
-        ) from None
-
+            ) from None
