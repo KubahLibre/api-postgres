@@ -15,5 +15,5 @@ RUN uv sync --frozen --no-dev
 EXPOSE 8000
 
 # --no-sync: der Container baut nichts neu, er startet nur, was schon da ist.
-CMD ["uv", "run", "--no-sync", "uvicorn", "api_postgres.uebung:app", \
+CMD ["uv", "run", "--no-sync", "uvicorn", "api_postgres.asgi:app", \
      "--host", "0.0.0.0", "--port", "8000"]
