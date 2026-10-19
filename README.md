@@ -1,8 +1,8 @@
 # Lernstand-API
 
-Eine FastAPI-Anwendung mit PostgreSQL dahinter. Themen lassen sich anlegen,
-auflisten, einzeln abrufen, im Status ändern und löschen. Keine Benutzeroberfläche —
-alles läuft über HTTP.
+Eine FastAPI-Anwendung mit PostgreSQL dahinter. Themen lassen sich anlegen, auflisten, einzeln abrufen, im Status ändern und
+löschen. Kategorien lassen sich anlegen, auflisten und löschen.
+Keine Benutzeroberfläche — alles läuft über HTTP.
 
 ## Schnellstart
 
@@ -31,6 +31,8 @@ einem benannten Datenträger, nicht in der Datei `db/init.sql`.
 | Methode | Adresse | Zweck | Fehlerfälle |
 |---|---|---|---|
 | GET | `/kategorien` | alle Kategorien | — |
+| POST | `/kategorien` | legt eine Kategorie an | 409, 422 |
+| DELETE | `/kategorien/{id}` | löscht eine Kategorie | 404, 409, 422 |
 | GET | `/themen` | alle Themen | — |
 | GET | `/themen/{id}` | ein einzelnes Thema | 404, 422 |
 | POST | `/themen` | legt ein Thema an | 400, 422 |
@@ -38,6 +40,10 @@ einem benannten Datenträger, nicht in der Datei `db/init.sql`.
 | DELETE | `/themen/{id}` | löscht ein Thema | 404, 422 |
 
 ### Beispiele
+
+Für Kategorien läuft es analog: `curl -s http://localhost:8001/kategorien` listet sie auf.
+
+Gültige Statuswerte sind `offen`, `angefangen` und `erledigt` — etwas anderes gibt 400.
 
 ```bash
 # alle Themen
@@ -66,6 +72,7 @@ curl -s -X DELETE http://localhost:8001/themen/5
 |---|---|---|
 | 400 | Die Anfrage war gültig, aber der Inhalt passt nicht | `kategorie_id` oder `status` existiert in der Datenbank nicht |
 | 404 | Die Adresse zeigt auf etwas, das es nicht gibt | keine Zeile mit dieser Nummer |
+| 409 | Die Anfrage ist in Ordnung, aber die Datenbank verweigert sie | doppelter Kategoriename, oder noch Themen an der Kategorie |
 | 422 | Die Anfrage war schon falsch, bevor jemand gefragt wurde | `/themen/abc` statt einer Zahl, oder ein fehlendes Pflichtfeld |
 
 Der Unterschied zwischen 404 und 422 ist wichtig: bei 404 **wurde** die
@@ -142,7 +149,7 @@ docker-compose.yml      zwei Dienste: die API und die Datenbank
 Dockerfile              baut das Image der API
 db/init.sql             legt Tabellen und Fremdschlüssel an
 src/api_postgres/
-  asgi.py               die Anwendung — alle sechs Endpunkte
+  asgi.py               die Anwendung — alle acht Endpunkte
   __init__.py           leer, wird vom Build gebraucht
 ```
 
