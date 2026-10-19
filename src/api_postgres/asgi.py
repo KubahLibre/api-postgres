@@ -26,6 +26,23 @@ def get_kategorien():
     return kategorien
 
 
+class KategorieIn(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+
+
+@app.post("/kategorien", status_code=201)
+def kategorie_anlegen(kategorie: KategorieIn) -> dict:
+    with db() as conn, conn.cursor() as cur:
+        try:
+            cur.execute("INSERT INTO kategorien (name) VALUES (%s) RETURNING *", (kategorie.name,))
+            return cur.fetchone()
+        except psycopg.errors.UniqueViolation:
+            raise HTTPException(
+                status_code=409,
+                detail=f"Kategorie '{kategorie.name}' gibt es schon.",
+            ) from None
+
+
 @app.get("/themen")
 def get_themen():
     with db() as conn, conn.cursor() as cur:
@@ -42,6 +59,7 @@ def get_thema(thema_id: int) -> dict:
     if thema is None:
         raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
     return thema
+
 
 
 class ThemaIn(BaseModel):
