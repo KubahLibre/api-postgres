@@ -43,6 +43,22 @@ def kategorie_anlegen(kategorie: KategorieIn) -> dict:
             ) from None
 
 
+@app.delete("/kategorien/{kategorie_id}", status_code=200)
+def kategorie_loeschen(kategorie_id: int) -> dict:
+    with db() as conn, conn.cursor() as cur:
+        try:
+            cur.execute("DELETE FROM kategorien WHERE id = %s RETURNING *", (kategorie_id,))
+            geloescht = cur.fetchone()
+        except psycopg.errors.ForeignKeyViolation:
+            raise HTTPException(
+                status_code=409,
+                detail="Diese Kategorie wird noch von Themen benutzt.",
+            ) from None
+    if geloescht is None:
+        raise HTTPException(status_code=404, detail="Kategorie nicht gefunden.")
+    return geloescht
+
+
 @app.get("/themen")
 def get_themen():
     with db() as conn, conn.cursor() as cur:
