@@ -163,6 +163,5 @@ Dienstes im Docker-Netz.
 
 ## Stand und offene Punkte
 
-- Die Datenbank enthält noch Testdaten aus der Entwicklung.
-- Es gibt keinen Endpunkt für Kategorien, mit denen man eine anlegt oder löscht.
+- Die Datenbank enthält keine Testdaten mehr.
 - Eine `GET /themen`-Variante mit Statusfilter (`?status=offen`) fehlt noch.
