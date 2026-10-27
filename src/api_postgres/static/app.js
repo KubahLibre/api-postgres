@@ -1,10 +1,8 @@
-const liste  = document.querySelector('#themen-liste');
-
-const formular        = document.querySelector('#neu-form');
-const kategorieSelect = document.querySelector('#kategorie-select');
-const titelInput      = document.querySelector('#titel-input');
-const notizInput      = document.querySelector('#notiz-input');
-
+const liste             = document.querySelector('#themen-liste');
+const formular          = document.querySelector('#neu-form');
+const kategorieSelect   = document.querySelector('#kategorie-select');
+const titelInput        = document.querySelector('#titel-input');
+const notizInput        = document.querySelector('#notiz-input');
 const statusReihenfolge = ['offen', 'angefangen', 'erledigt'];
 
 kategorienLaden();
@@ -40,10 +38,9 @@ async function laden() {
           </div>
           <span class="status status-${t.status}">${t.status}</span>
         </div>        <div class="kat">Kategorie: ${kategorienListe.find(k => k.id === t.kategorie_id)?.name ?? '(unbekannt)'}</div>
-        <div class="notiz">Notiz: ${t.notiz ?? '—'}</div>
+                <div class="notiz">Notiz: ${t.notiz ?? '—'} <button class="bearb-btn" data-id="${t.id}" title="Notiz bearbeiten">&#9999;</button></div>
                 <div class="aktionen">
           <button class="status-btn" data-id="${t.id}" data-status="${t.status}">Status weiter</button>
-          <button class="bearb-btn" data-id="${t.id}">Notiz bearbeiten</button>
           <button class="loesch-btn" data-id="${t.id}">Löschen</button>
         </div>
       </li>`

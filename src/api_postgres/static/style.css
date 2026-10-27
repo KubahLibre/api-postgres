@@ -135,15 +135,20 @@ button {
   min-width: 0;
 }
 
-.titel-btn {
+.titel-btn,
+.bearb-btn {
   padding: 0.15rem 0.45rem;
-  font-size: 0.8rem;
-  background: transparent;
-  border: none;
-  color: var(--gedaempft);
+  font-size: 0.9rem;
+  background: #232b3a;
+  border: 1px solid #3a4657;
+  border-radius: 8px;
+  color: #e6e9f0;
   cursor: pointer;
 }
 
-.titel-btn:hover {
-  color: var(--blau);
+.titel-btn:hover,
+.bearb-btn:hover {
+  color: #ffffff;
+  background: #2c3648;
+  border-color: #5a6a80;
 }
