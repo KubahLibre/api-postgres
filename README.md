@@ -3,7 +3,7 @@
 Eine FastAPI-Anwendung mit PostgreSQL dahinter. Themen lassen sich anlegen, auflisten, einzeln abrufen, im Status ändern und
 löschen. Kategorien lassen sich anlegen, auflisten und löschen.
 Dazu kommt eine kleine Weboberfläche aus reinem HTML/CSS/JavaScript — die API
-liefert sie selbst aus, siehe „Die Weboberfläche”
+liefert sie selbst aus, siehe „Die Weboberfläche”.
 
 ## Schnellstart
 
@@ -38,7 +38,7 @@ einem benannten Datenträger, nicht in der Datei `db/init.sql`.
 | GET | `/themen` | alle Themen | — |
 | GET | `/themen/{id}` | ein einzelnes Thema | 404, 422 |
 | POST | `/themen` | legt ein Thema an | 400, 422 |
-| PUT | `/themen/{id}` | ändert den Status | 400, 404, 422 |
+| PUT | `/themen/{id}` | ändert Titel, Status oder Notiz | 400, 404, 422 |
 | DELETE | `/themen/{id}` | löscht ein Thema | 404, 422 |
 
 ### Beispiele
