@@ -12,15 +12,16 @@ const statusReihenfolge = ['offen', 'angefangen', 'erledigt'];
 
 kategorienLaden();
 
+let kategorienListe = [];
+
 async function kategorienLaden() {
   const antwort = await fetch('/kategorien');
   if (!antwort.ok) return;
-  const kategorien = await antwort.json();
-  kategorieSelect.innerHTML = kategorien
+  kategorienListe = await antwort.json();
+  kategorieSelect.innerHTML = kategorienListe
     .map(k => `<option value="${k.id}">${k.name}</option>`)
     .join('');
 }
-
 async function laden() {
   try {
     const antwort = await fetch('/themen');
@@ -34,7 +35,7 @@ async function laden() {
     liste.innerHTML = themen.map(t =>
       `<li><strong>${t.titel}</strong> — `
       + `<span class="status">${t.status}</span> — `
-      + `Kategorie ${t.kategorie_id}, Notiz: ${t.notiz ?? '—'} `
+      + `Kategorie ${kategorienListe.find(k => k.id === t.kategorie_id)?.name ?? '(unbekannt)'}, Notiz: ${t.notiz ?? '—'} `
       + `<button class="status-btn" data-id="${t.id}" data-status="${t.status}">Status weiter</button> `
       + `<button class="loesch-btn" data-id="${t.id}">Löschen</button></li>`
     ).join('');
