@@ -2,7 +2,8 @@
 
 Eine FastAPI-Anwendung mit PostgreSQL dahinter. Themen lassen sich anlegen, auflisten, einzeln abrufen, im Status ändern und
 löschen. Kategorien lassen sich anlegen, auflisten und löschen.
-Keine Benutzeroberfläche — alles läuft über HTTP.
+Dazu kommt eine kleine Weboberfläche aus reinem HTML/CSS/JavaScript — die API
+liefert sie selbst aus, siehe „Die Weboberfläche”
 
 ## Schnellstart
 
@@ -16,6 +17,7 @@ der Container, aber alle Abfragen scheitern, weil es keine Tabellen gibt.
 
 Die API ist danach unter `http://localhost:8001` erreichbar. Die interaktive
 Dokumentation liegt unter `http://localhost:8001/docs`.
+Die Weboberfläche ist zusätzlich unter `http://localhost:8001/` im Browser.
 
 Stoppen:
 
@@ -78,6 +80,42 @@ curl -s -X DELETE http://localhost:8001/themen/5
 Der Unterschied zwischen 404 und 422 ist wichtig: bei 404 **wurde** die
 Datenbank gefragt und sie hatte nichts. Bei 422 wird **gar nicht erst** gefragt,
 weil schon die Form der Anfrage falsch ist.
+
+## Die Weboberfläche
+
+Die Seite besteht aus drei Dateien und nutzt kein Framework:
+
+```
+src/api_postgres/static/
+  index.html   Struktur
+  style.css    Aussehen
+  app.js       Verhalten — alle Anfragen an die API per fetch()
+```
+
+Die API liefert die Seite selbst aus: `GET /` gibt `index.html` zurück,
+alles unter `/static/` kommt über einen StaticFiles-Mount direkt aus dem
+Ordner. Dadurch stammen Seite und Anfragen aus derselben Herkunft
+(`localhost:8001`) — kein CORS nötig.
+
+Was die Seite kann:
+
+- Beim Aufruf werden Kategorien und Themen automatisch geladen
+  (`GET /kategorien`, `GET /themen`)
+- Themen anlegen per Formular (`POST /themen`) — Kategorie als Dropdown, nie
+  eine Zahl getippt, kein Status-Feld (die API setzt `offen` fest)
+- Titel ändern (Stift am Titel, `PUT /themen/{id}`) und Notiz ändern
+  (Stift an der Notiz)
+- Status umschalten (`PUT /themen/{id}`) im Ring
+  `offen → angefangen → erledigt`
+- Löschen (`DELETE /themen/{id}`) nur nach Bestätigungsdialog
+- Kategorienamen werden im Browser aus der Kategorien-Liste aufgelöst
+
+Kategorien anlegen und löschen gibt es in der Weboberfläche nicht — das
+bleibt HTTP-Arbeit.
+
+Wichtig für Änderungen an der Seite: Die Dateien liegen im Image
+(`COPY src/ ./src/` im Dockerfile) — nach jeder Änderung erneut bauen
+(`docker compose up -d --build`) und im Browser hart neu laden (Strg+F5).
 
 ## Die Datenbank
 
@@ -150,6 +188,7 @@ Dockerfile              baut das Image der API
 db/init.sql             legt Tabellen und Fremdschlüssel an
 src/api_postgres/
   asgi.py               die Anwendung — alle acht Endpunkte
+  static/               die Weboberfläche: index.html, style.css, app.js
   __init__.py           leer, wird vom Build gebraucht
 ```
 
@@ -172,3 +211,5 @@ Dienstes im Docker-Netz.
 
 - Die Datenbank enthält keine Testdaten mehr.
 - Eine `GET /themen`-Variante mit Statusfilter (`?status=offen`) fehlt noch.
+- Die Weboberfläche verwaltet Kategorien nur zum Auslesen (Dropdown) —
+  Kategorien anlegen und löschen bleibt HTTP-Arbeit.
