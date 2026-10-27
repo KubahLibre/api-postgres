@@ -35,7 +35,7 @@ einem benannten Datenträger, nicht in der Datei `db/init.sql`.
 | GET | `/kategorien` | alle Kategorien | — |
 | POST | `/kategorien` | legt eine Kategorie an | 409, 422 |
 | DELETE | `/kategorien/{id}` | löscht eine Kategorie | 404, 409, 422 |
-| GET | `/themen` | alle Themen | — |
+| GET | `/themen` | alle Themen, optional gefiltert mit `?status=...` | 400 |
 | GET | `/themen/{id}` | ein einzelnes Thema | 404, 422 |
 | POST | `/themen` | legt ein Thema an | 400, 422 |
 | PUT | `/themen/{id}` | ändert Titel, Status oder Notiz | 400, 404, 422 |
@@ -210,6 +210,5 @@ Dienstes im Docker-Netz.
 ## Stand und offene Punkte
 
 - Die Datenbank enthält keine Testdaten mehr.
-- Eine `GET /themen`-Variante mit Statusfilter (`?status=offen`) fehlt noch.
 - Die Weboberfläche verwaltet Kategorien nur zum Auslesen (Dropdown) —
   Kategorien anlegen und löschen bleibt HTTP-Arbeit.
