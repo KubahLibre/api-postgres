@@ -129,3 +129,23 @@ button {
 
 .status-btn:hover { background: #6b5c28; }
 .loesch-btn:hover { background: #6b2833; }
+
+.kopf-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.titel-btn {
+  padding: 0.15rem 0.45rem;
+  font-size: 0.8rem;
+  background: transparent;
+  border: none;
+  color: var(--gedaempft);
+  cursor: pointer;
+}
+
+.titel-btn:hover {
+  color: var(--blau);
+}

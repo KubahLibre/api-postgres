@@ -102,20 +102,38 @@ def thema_anlegen(neu: ThemaIn) -> dict:
                 ) from None
 
 
-class StatusAenderung(BaseModel):
-    status: str
+class ThemaAenderung(BaseModel):
+    titel: str | None = Field(default=None, min_length=1, max_length=200)
+    kategorie_id: int | None = None
+    notiz: str | None = None
+    status: str | None = None
 
 
 @app.put("/themen/{thema_id}")
-def thema_bearbeiten(thema_id: int, neu: StatusAenderung) -> dict:
+def thema_bearbeiten(thema_id: int, neu: ThemaAenderung) -> dict:
+    felder = {}
+    if neu.titel is not None:
+        felder["titel"] = neu.titel
+    if neu.kategorie_id is not None:
+        felder["kategorie_id"] = neu.kategorie_id
+    if neu.notiz is not None:
+        felder["notiz"] = neu.notiz
+    if neu.status is not None:
+        felder["status"] = neu.status
+    if not felder:
+        raise HTTPException(status_code=422, detail="Keine Aenderung mitgeschickt.")
+
+    set_teil = ", ".join(f"{name} = %s" for name in felder)
+    werte = list(felder.values()) + [thema_id]
+
     with db() as conn, conn.cursor() as cur:
         try:
-            cur.execute("UPDATE themen SET status = %s WHERE id = %s RETURNING *", (neu.status, thema_id))
+            cur.execute(f"UPDATE themen SET {set_teil} WHERE id = %s RETURNING *", werte)
             thema = cur.fetchone()
         except psycopg.errors.ForeignKeyViolation:
             raise HTTPException(
                 status_code=400,
-                detail=f"Status '{neu.status}' gibt es nicht.",
+                detail="Kategorie oder Status gibt es nicht.",
             ) from None
     if thema is None:
         raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
