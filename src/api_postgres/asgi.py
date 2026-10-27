@@ -4,10 +4,12 @@ from fastapi import FastAPI, HTTPException
 from psycopg.rows import dict_row
 from pydantic import BaseModel, Field
 from contextlib import contextmanager
-
+from pathlib import Path
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 app = FastAPI()
-
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -128,3 +130,8 @@ def thema_loeschen(thema_id: int):
     if geloescht is None:
         raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
     return geloescht
+
+
+@app.get("/")
+def startseite():
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
