@@ -6,6 +6,7 @@ const notizInput        = document.querySelector('#notiz-input');
 const kategorieForm     = document.querySelector('#kategorie-form');
 const kategorieName     = document.querySelector('#kategorie-name');
 const kategorienListeEl = document.querySelector('#kategorien-liste');
+const filterAuswahl     = document.querySelector('#filter-auswahl');
 const statusReihenfolge = ['offen', 'angefangen', 'erledigt'];
 
 kategorienLaden();
@@ -34,7 +35,8 @@ async function kategorienLaden() {
 }
 async function laden() {
   try {
-    const antwort = await fetch('/themen');
+    const filter = filterAuswahl.value;
+    const antwort = await fetch('/themen' + (filter ? '?status=' + filter : ''));
 
     if (!antwort.ok) {
       liste.textContent = 'Fehler: HTTP ' + antwort.status;
@@ -250,3 +252,5 @@ document.addEventListener('click', (ereignis) => {
     pop.open = false;
   }
 });
+
+filterAuswahl.addEventListener('change', laden);

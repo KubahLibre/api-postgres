@@ -228,3 +228,9 @@ button {
   z-index: 10;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
+.filter-zeile {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.25rem 0 1.25rem;
+}

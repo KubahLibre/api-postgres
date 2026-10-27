@@ -60,14 +60,22 @@ def kategorie_loeschen(kategorie_id: int) -> dict:
         raise HTTPException(status_code=404, detail="Kategorie nicht gefunden.")
     return geloescht
 
-
 @app.get("/themen")
-def get_themen():
+def get_themen(status: str | None = None):
+    sql = "SELECT * FROM themen"
+    parameter = ()
+    if status is not None:
+        sql += " WHERE status = %s"
+        parameter = (status,)
+
     with db() as conn, conn.cursor() as cur:
-        cur.execute("SELECT * FROM themen ORDER BY id")
+        if status is not None:
+            cur.execute("SELECT status FROM themen_status WHERE status = %s", (status,))
+            if cur.fetchone() is None:
+                raise HTTPException(status_code=400, detail=f"Status '{status}' gibt es nicht.")
+        cur.execute(sql, parameter)
         themen = cur.fetchall()
     return themen
-
 
 @app.get("/themen/{thema_id}")
 def get_thema(thema_id: int) -> dict:
