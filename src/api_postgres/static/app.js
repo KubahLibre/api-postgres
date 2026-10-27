@@ -32,14 +32,21 @@ async function laden() {
     }
 
     const themen = await antwort.json();
+    
     liste.innerHTML = themen.map(t =>
-      `<li><strong>${t.titel}</strong> — `
-      + `<span class="status">${t.status}</span> — `
-      + `Kategorie ${kategorienListe.find(k => k.id === t.kategorie_id)?.name ?? '(unbekannt)'}, Notiz: ${t.notiz ?? '—'} `
-      + `<button class="status-btn" data-id="${t.id}" data-status="${t.status}">Status weiter</button> `
-      + `<button class="loesch-btn" data-id="${t.id}">Löschen</button></li>`
+      `<li class="karte">
+        <div class="kopf">
+          <strong>${t.titel}</strong>
+          <span class="status status-${t.status}">${t.status}</span>
+        </div>
+        <div class="kat">Kategorie: ${kategorienListe.find(k => k.id === t.kategorie_id)?.name ?? '(unbekannt)'}</div>
+        <div class="notiz">Notiz: ${t.notiz ?? '—'}</div>
+        <div class="aktionen">
+          <button class="status-btn" data-id="${t.id}" data-status="${t.status}">Status weiter</button>
+          <button class="loesch-btn" data-id="${t.id}">Löschen</button>
+        </div>
+      </li>`
     ).join('');
-
     liste.querySelectorAll('.status-btn').forEach(b =>
       b.addEventListener('click', () => statusAendern(b.dataset.id, b.dataset.status)));
     liste.querySelectorAll('.loesch-btn').forEach(b =>

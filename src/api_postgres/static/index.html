@@ -2,21 +2,35 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lernstand</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/app.js" defer></script>
 </head>
 <body>
-  <h1>Lernstand-API</h1>
-<h2>Neues Thema anlegen</h2>
-<form id="neu-form">
-  <input id="titel-input" placeholder="Titel (Pflicht)" required>
-  <select id="kategorie-select" required>
-    <option value="">Kategorie wählen…</option>
-  </select>
-  <input id="notiz-input" placeholder="Notiz (freiwillig)">
-  <button type="submit">Anlegen</button>
-</form>
+  <header>
+    <h1>Lernstand-API</h1>
+    <p class="unterzeile">Browser &rarr; FastAPI &rarr; PostgreSQL</p>
+  </header>
+
+  <section class="form-karte">
+    <h2>Neues Thema anlegen</h2>
+    <form id="neu-form">
+      <label>Titel (Pflicht)
+        <input id="titel-input" required>
+      </label>
+      <label>Kategorie
+        <select id="kategorie-select" required>
+          <option value="">Kategorie w&auml;hlen&hellip;</option>
+        </select>
+      </label>
+      <label>Notiz (freiwillig)
+        <input id="notiz-input">
+      </label>
+      <button type="submit" class="anlege-btn">Anlegen</button>
+    </form>
+  </section>
+
   <button id="lade-btn">Themen laden</button>
   <ul id="themen-liste"></ul>
 </body>

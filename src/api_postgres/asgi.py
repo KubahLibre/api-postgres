@@ -64,7 +64,7 @@ def kategorie_loeschen(kategorie_id: int) -> dict:
 @app.get("/themen")
 def get_themen():
     with db() as conn, conn.cursor() as cur:
-        cur.execute("SELECT * FROM themen")
+        cur.execute("SELECT * FROM themen ORDER BY id")
         themen = cur.fetchall()
     return themen
 
