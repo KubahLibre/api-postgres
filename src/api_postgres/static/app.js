@@ -3,6 +3,9 @@ const formular          = document.querySelector('#neu-form');
 const kategorieSelect   = document.querySelector('#kategorie-select');
 const titelInput        = document.querySelector('#titel-input');
 const notizInput        = document.querySelector('#notiz-input');
+const kategorieForm     = document.querySelector('#kategorie-form');
+const kategorieName     = document.querySelector('#kategorie-name');
+const kategorienListeEl = document.querySelector('#kategorien-liste');
 const statusReihenfolge = ['offen', 'angefangen', 'erledigt'];
 
 kategorienLaden();
@@ -14,9 +17,20 @@ async function kategorienLaden() {
   const antwort = await fetch('/kategorien');
   if (!antwort.ok) return;
   kategorienListe = await antwort.json();
+
   kategorieSelect.innerHTML = kategorienListe
     .map(k => `<option value="${k.id}">${k.name}</option>`)
     .join('');
+
+  kategorienListeEl.innerHTML = kategorienListe
+    .map(k =>
+      `<li class="kategorie-zeile">
+        <span>${k.name}</span>
+        <button class="kat-loesch-btn" data-id="${k.id}">Löschen</button>
+      </li>`)
+    .join('');
+  kategorienListeEl.querySelectorAll('.kat-loesch-btn').forEach(b =>
+    b.addEventListener('click', () => kategorieLoeschen(b.dataset.id)));
 }
 async function laden() {
   try {
@@ -179,5 +193,60 @@ formular.addEventListener('submit', async (ereignis) => {
     await laden();
   } catch (fehler) {
     liste.textContent = 'Verbindung fehlgeschlagen: ' + fehler;
+  }
+});
+
+async function kategorieLoeschen(id) {
+  const name = kategorienListe.find(k => k.id === Number(id))?.name ?? id;
+  if (!confirm('Kategorie „' + name + '” wirklich loeschen?')) return;
+  try {
+    const antwort = await fetch('/kategorien/' + id, { method: 'DELETE' });
+
+    if (antwort.status === 409) {
+      alert('Diese Kategorie hat noch Themen (HTTP 409) — loesche oder verschiebe sie zuerst.');
+      return;
+    }
+
+    if (!antwort.ok) {
+      alert('Fehler: HTTP ' + antwort.status);
+      return;
+    }
+
+    kategorienLaden();
+  } catch (fehler) {
+    alert('Verbindung fehlgeschlagen: ' + fehler);
+  }
+}
+
+kategorieForm.addEventListener('submit', async (ereignis) => {
+  ereignis.preventDefault();
+  try {
+    const antwort = await fetch('/kategorien', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: kategorieName.value }),
+    });
+
+    if (antwort.status === 409) {
+      alert('Dieser Name existiert bereits (HTTP 409).');
+      return;
+    }
+
+    if (!antwort.ok) {
+      alert('Fehler: HTTP ' + antwort.status);
+      return;
+    }
+
+    kategorieName.value = '';
+    kategorienLaden();
+  } catch (fehler) {
+    alert('Verbindung fehlgeschlagen: ' + fehler);
+  }
+});
+
+document.addEventListener('click', (ereignis) => {
+  const pop = document.querySelector('.kategorien-pop');
+  if (pop.open && !pop.contains(ereignis.target)) {
+    pop.open = false;
   }
 });

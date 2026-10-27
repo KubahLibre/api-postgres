@@ -8,9 +8,24 @@
   <script src="/static/app.js" defer></script>
 </head>
 <body>
-  <header>
+   <header>
     <h1>Lernstand-API</h1>
-    <p class="unterzeile">Browser &rarr; FastAPI &rarr; PostgreSQL</p>
+    <div class="kopf-zeile">
+      <p class="unterzeile">Browser &rarr; FastAPI &rarr; PostgreSQL</p>
+
+      <details class="kategorien-pop">
+        <summary>Kategorien</summary>
+        <div class="pop-fenster">
+          <form id="kategorie-form">
+            <label>Name (Pflicht)
+              <input id="kategorie-name" required>
+            </label>
+            <button type="submit" class="anlege-btn">Anlegen</button>
+          </form>
+          <ul id="kategorien-liste"></ul>
+        </div>
+      </details>
+    </div>
   </header>
 
   <section class="form-karte">
