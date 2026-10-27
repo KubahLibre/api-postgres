@@ -67,6 +67,7 @@ def get_themen(status: str | None = None):
     if status is not None:
         sql += " WHERE status = %s"
         parameter = (status,)
+    sql += " ORDER BY id"
 
     with db() as conn, conn.cursor() as cur:
         if status is not None:
