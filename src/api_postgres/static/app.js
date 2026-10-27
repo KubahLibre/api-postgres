@@ -1,7 +1,4 @@
-const button = document.querySelector('#lade-btn');
 const liste  = document.querySelector('#themen-liste');
-
-button.addEventListener('click', laden);
 
 const formular        = document.querySelector('#neu-form');
 const kategorieSelect = document.querySelector('#kategorie-select');
@@ -11,6 +8,7 @@ const notizInput      = document.querySelector('#notiz-input');
 const statusReihenfolge = ['offen', 'angefangen', 'erledigt'];
 
 kategorienLaden();
+laden();
 
 let kategorienListe = [];
 
