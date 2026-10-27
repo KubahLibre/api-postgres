@@ -109,9 +109,11 @@ Was die Seite kann:
   `offen → angefangen → erledigt`
 - Löschen (`DELETE /themen/{id}`) nur nach Bestätigungsdialog
 - Kategorienamen werden im Browser aus der Kategorien-Liste aufgelöst
+- Statusfilter per Dropdown über der Liste (`GET /themen?status=offen`)
+- Kategorien anlegen und löschen im Pop-Fenster der Kopfzeile
+  (`POST /kategorien`, `DELETE /kategorien/{id}`), 409-Fälle als Dialog
 
-Kategorien anlegen und löschen gibt es in der Weboberfläche nicht — das
-bleibt HTTP-Arbeit.
+Kategorien anlegen und löschen stecken im Pop-Fenster der Kopfzeile.
 
 Wichtig für Änderungen an der Seite: Die Dateien liegen im Image
 (`COPY src/ ./src/` im Dockerfile) — nach jeder Änderung erneut bauen
