@@ -11,6 +11,11 @@ from fastapi.responses import FileResponse
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=Path(__file__).parent / "static"), name="static")
 
+@app.get("/")
+def startseite():
+    return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 
 
@@ -157,8 +162,3 @@ def thema_loeschen(thema_id: int):
     if geloescht is None:
         raise HTTPException(status_code=404, detail="Thema nicht gefunden.")
     return geloescht
-
-
-@app.get("/")
-def startseite():
-    return FileResponse(Path(__file__).parent / "static" / "index.html")
